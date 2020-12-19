@@ -1,0 +1,316 @@
+<!-- change div class & id app.subject => appt identifer when connected to database -->
+
+{% extends "layout.html" %}
+{% block content %}
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <div class="container">
+            <a href="/" class="navbar-brand">Scheduler</a>
+            <button class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown mr-3">
+                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                        <i class="fas fa-user"></i> Account Settings
+                        </a>
+                        <div class="dropdown-menu">
+                        <a href="/" class="dropdown-item">
+                            Logout
+                        </a>
+                        <a data-toggle="modal" href="#updateInfo" class="dropdown-item">
+                            Update Info
+                        </a>
+                        <a data-toggle="modal" href="#deleteAccount" class="dropdown-item">
+                            Delete Account
+                        </a>
+                        </div>
+                    </li>
+                </ul>
+              </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <header id="account-actions">
+            <div class="row no-gutters">
+                <!-- Customer greeting and name -->
+                <div class="col-lg-4 col-md-5">
+                    <h1>Hi, {{name}}!</h1>
+                    <h2>Account Page</h2>
+                </div>
+                
+                <!-- Menu Selection -->
+                <div class="col-lg-8 col-md-7">
+                    <div class="d-flex flex-column">
+                        <div class="bg-dark menu-header">
+                            <h3>Click on Section to view</h3>
+                        </div>
+                        
+                        <div>
+                            <div class="d-flex flex-row text-white align-items-stretch text-center">
+                                <div class="menu-item p-4 bg-primary" data-toggle="collapse" data-target="#Current">
+                                    <span class="d-none d-sm-block">Current</span>
+                                </div>
+                                <div class="menu-item p-4 bg-danger" data-toggle="collapse" data-target="#Cancel">
+                                    <span class="d-none d-sm-block">Cancel</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Current primary-->
+        <div id="Current" class="collapse show">
+            <div class="card card-body bg-primary text-white py-3">
+                <h2>Current Appointments</h2>
+                <p>Click on appointment to edit or click on day to schedule new appt.</p>
+                {% if mess != "NA" %}
+                    <p>{{ message }}</p>
+                {% endif %}
+            </div>
+            <div class="card card-body py-3">
+                <div id="calendar"></div>
+            </div>
+
+            <!-- Edit appot -->
+            <div class="modal" id="editAppt">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title">Let's reschedule!</h2>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Select a new date and time to reschedule or exit to keep the same.</p>
+                            <form action="/account?username={{ username }}&mess={{ mess }}" method="POST">
+                                {{ eform.hidden_tag() }}
+                                <fieldset class="form-group">
+                                    {{ eform.oldDate(type="hidden", id="od") }}
+                                    {{ eform.oldSubject(type="hidden", id="os") }}
+                                    <div class="form-group">
+                                        {% if eform.editDate.errors %}
+                                            {{ eform.editDate.label(class="form-control-label") }}
+                                            {{ eform.editDate(class="form-control form-control.lg datepicker") }}
+                                            <div class="invalid-feedback text-left">
+                                                {% for error in eform.editDate.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            {{ eform.editDate.label(class="form-control-label") }}
+                                            {{ eform.editDate(class="form-control form-control.lg datepicker") }}
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group">
+                                        {% if eform.editTime.errors %}
+                                            {{ eform.editTime.label(class="form-control-label") }}
+                                            {{ eform.editTime(class="form-control form-control.lg is-invalid")}}
+                                            <div class="invalid-feedback text-left">
+                                                {% for error in eform.editTime.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            {{ eform.editTime.label(class="form-control-label") }}
+                                            {{ eform.editTime(class="form-control form-control.lg")}}
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ eform.esubmit(class="btn btn-outline-info") }}
+                                    </div>
+                                </fieldset>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- new appointment modal -->
+            <div class="modal" id="newAppt">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title">New Appointment!</h2>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="/account?username={{ username }}&mess={{ mess }}" method="POST">
+                                {{ nform.hidden_tag() }}
+                                <fieldset class="form-group">
+                                    {{ nform.newDate(type="hidden", id="nd") }}
+                                    <div class="form-group">
+                                        {% if nform.newSubject.errors %}
+                                            {{ nform.newSubject.label(class="form-control-label") }}
+                                            {{ nform.newSubject(class="form-control form-control.lg is-invalid")}}
+                                            <div class="invalid-feedback text-left">
+                                                {% for error in nform.newSubject.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            {{ nform.newSubject.label(class="form-control-label") }}
+                                            {{ nform.newSubject(class="form-control form-control.lg")}}
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group">
+                                        {% if nform.newTime.errors %}
+                                            {{ nform.newTime.label(class="form-control-label") }}
+                                            {{ nform.newTime(class="form-control form-control.lg is-invalid")}}
+                                            <div class="invalid-feedback text-left">
+                                                {% for error in nform.newTime.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            {{ nform.newTime.label(class="form-control-label") }}
+                                            {{ nform.newTime(class="form-control form-control.lg")}}
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ nform.newNote.label(class="form-control-label") }}
+                                        {{ nform.newNote(class="form-control form-control.lg")}}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ nform.nsubmit(class="btn btn-outline-info") }}
+                                    </div>
+                                </fieldset>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cancel-->
+        <div id="Cancel" class="collapse">
+            <div class="card card-body bg-danger text-white py-3">
+                <h2>Change Appointment</h2>
+            </div>
+            <div class="card card-body py-3">
+                <div class="container">
+                    {% for appt in appointments %}
+                    <div class="row row-striped {{appt.subject}}">
+                        <div class="col-2 text-left text-uppercase">
+                            <h1 class="display-4"><span class="badge badge-secondary"> {{appt.day}} </span></h1>
+                            <h2 class=month> {{appt.month}} </h2>
+                        </div>
+                        <div class="col-10 test">
+                            <h3 class="text-uppercase"><strong> {{appt.subject}} </strong></h3>
+                            <ul class="list-inline">
+                                <li class="list-inline-item"><i class="far fa-calendar-check"></i> {{appt.weekday}} </li>
+                                <li class="list-inline-item"><i class="far fa-clock"></i> {{appt.time}} </li>
+                            </ul>
+                            <p> {{appt.notes}} </p>
+                        </div>
+                        <div class="col-8 text-right">
+                            <button class="btn btn-danger btn-lg" type="button" data-toggle="modal" data-target="#confirm{{appt.subject}}">Cancel</button>
+                        </div>
+                    </div>
+                    <div class="modal" id="confirm{{appt.subject}}">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h2 class="modal-title">Please confirm!</h2>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="/account?username={{ username }}&mess={{ mess }}" method="POST">
+                                        {{ cform.hidden_tag() }}
+                                        <p>Exit to keep your appointment or select confirm to cancel appointment</p>
+                                        <fieldset class="form-group">
+                                            {{ cform.delDate(type="hidden", value=appt.cID) }}
+                                            <div class="form-group">
+                                                {{ cform.submit(class="btn btn-outline-info") }}
+                                            </div>
+                                        </fieldset>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- update student info -->
+        <div class="modal" id="updateInfo">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Update Student Information!</h2>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Please enter the changes in the appropriate response box.</p>
+                        <p>Leave response blank empty to keep the old information.</p>
+                        <form action="/account?username={{ username }}&mess={{ mess }}" method="POST">
+                            {{ uform.hidden_tag() }}
+                            <fieldset class="form-group">
+                                <div class="form-group">
+                                    {{ uform.newFirstName.label(class="form-control-label") }}
+                                    {{ uform.newFirstName(class="form-control form-control.lg")}}
+                                </div>
+                                <div class="form-group">
+                                    {{ uform.newUserName.label(class="form-control-label") }}
+                                    {{ uform.newUserName(class="form-control form-control.lg")}}
+                                </div>
+                                <div class="form-group">
+                                    {{ uform.usubmit(class="btn btn-outline-info") }}
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- delete account -->
+        <div class="modal" id="deleteAccount">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Delete Account!</h2>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Exit to keep account or confirm deletion via delete button below.</p>
+                        <form action="/account?username={{ username }}&mess={{ mess }}" method="POST">
+                            {{ dform.hidden_tag() }}
+                            <fieldset class="form-group">
+                                <div class="form-group">
+                                    {{ dform.delsubmit(class="btn btn-outline-info") }}
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer? -->
+        <footer id="main-footer" class="bg-dark text-white menu-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3> Don't forget to have some fun today!</h3>
+                </div>
+            </div>
+        </footer>
+    </div>
+{% endblock content%}

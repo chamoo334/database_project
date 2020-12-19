@@ -1,0 +1,113 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h1>Index Page</h1>
+    
+    <h2>Page Information</h2>
+    <ul>
+        <li>
+            <a href="/">Main</a>
+            <p>
+                Main page provides registration and login for both tutors and students.
+                <br> Additionally, provides information on subject offerings and the tutoring environment.
+            </p>
+        </li>
+        <li>
+            <a href="/register-student">Student Register</a>
+            <p>
+                Registers students by inserting information into Students table.
+                <br>Once registerd, students will be directed to account page.
+            </p>
+        </li>
+        <li>
+            <a href="/register-tutor">Tutor Register</a>
+            <p>
+                Registers tutors by inserting information into Tutors table.
+                <br>Once registerd, tutors will be directed to lessons page.
+            </p>
+        </li>
+        <li>
+            <a href="/login">Login</a></li>
+            <p>
+                Allows students and tutors to login to view account information.
+                <br>Requires declaration of type of account to determine which
+                <br>table (Students or Tutors) will be used to verify username
+                <br>and password.
+            </p>
+        <li>
+            <a href="/account">Account (Students)</a>
+            <p>
+                After login, studentID will be used to find and list all
+                <br>scheduled appointments in StudentsClasses. These appointments 
+                <br>can be updated or deleted as well. Clicking on date allows 
+                <br>student to make a new appointment that will be inserted into
+                <br>TimeSlots and eventually Classes once a tutor signs up to teach
+                <br>the class.
+            </p>
+        </li>
+        <li>
+            <a href="/lessons">Lessons (Tutors)</a>
+            <p>
+                After login, tutorID will be used to find and display all
+                <br>scheduled appointments in TutorsClasses. These appoinments can be cancelled which
+                <br>will remove the tutor from this class listing in Classes. Tutors will
+                <br>have access to view available appointments by viewing a listing
+                <br>of appointments found in StudentClasses but not found in Classes. Once tutor agrees
+                <br>to teach this classe, all information will be added to Classes.
+            </p>
+        </li>
+        <li>
+            <a href="/admin">Admin</a>
+            <p>
+                Admin page provides administration the ability to view, search, and sort the Students,
+                <br>Tutors, Subjects, and TimeSlots tables along with the option to delete the account. 
+                <br>Additionally, the admin page provides the ability to insert, edit, and delete Subjects
+                <br>and TimeSlots. Lastly, the admin page has the ability to alter the Classes table
+                <br>by selecting a different tutor for upcoming StudentsClasses.
+            </p>
+            <p>Admin login as tutor with username and password provided in project report..</p>
+        </li>
+    </ul>
+
+    <h2>Test Data</h2>
+    <ul>
+        <li>
+            <h4>Students </h4>
+            <p>31. Charlie Brown
+            <br>32. Steve Madden
+            <br>33. Francis France</p>
+        </li>
+        <li>
+            <h4>Tutors</h4>
+            <p>15. Admin Admin 
+            <br>16.Math Guy
+            <br>17. Physics Gal
+            <br>18. Computer Science</p>
+        </li>
+        <li>
+            <h4>subjects</h4>
+            <p>1. Math
+            <br>2. Physics
+            <br>3. Computer Science</p>
+        </li>
+        <li>
+            <h4>Timeslots</h4>
+            <p>1. 10:00:00
+            <br>2. 12:00:00
+            <br>2. 14:00:00
+            <br>4. 16:00:00</p>
+        </li>
+        <li>
+            <h4>Classes</h4>
+            <p>1. December 09, 2020     Math	    10 AM	Charlie Brown	Math Guy
+            <br>2. December 10, 2020	Physics	    10 AM	Charlie Brown
+            <br>3. December 11, 2020	CS	        10 AM	Charlie Brown
+            <br>4. December 16, 2020	Math	    4 PM	Francis France
+            <br>5. December 16, 2020	Math	    12 PM	Steve Madden
+            <br>6. December 17, 2020	Physics	    12 PM	Steve Madden	Physics Gal1
+            <br>7. December 17, 2020	Physics	    4 PM	Francis France
+            <br>8. December 18, 2020	CS	        12 PM	Steve Madden
+            <br>9. December 18, 2020	CS	        4 PM	Francis France	Computer Science</p>
+        </li>
+    </ul>
+
+{% endblock content%}

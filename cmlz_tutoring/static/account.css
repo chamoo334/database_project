@@ -1,0 +1,66 @@
+body {
+    background: pink;
+}
+
+
+.navbar {
+    opacity: 0.8;
+    border-bottom: none;
+}
+
+#navbarCollapse {
+    position: relative;
+    z-index: 5;
+}
+
+.dropdown-menu{
+    position: relative;
+    z-index: 5;
+}
+
+#navbarCollapse ul li a {
+    position: relative;
+    z-index: 5;
+}
+
+.menu-item {
+    width: 50%;
+}
+
+.menu-item:hover {
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+.menu-header{
+    color: white;
+    text-align: center;
+    opacity: 0.8;
+}
+
+@media (min-width: 576px) {
+    .navbar-expand-sm .navbar-nav .dropdown-menu {
+        position: unset;
+        overflow: visible;
+    }
+}
+
+/* Current Section */
+
+
+/* Change Section */
+.row-striped:nth-of-type(odd) {
+    background-color: #efefef;
+    border-left: 4px #000000 solid;
+}
+
+.row-striped:nth-of-type(even) {
+    background-color: #ffffff;
+    border-left: 4px #efefef solid;
+}
+
+.row-striped {
+    padding: 15px 0;
+}
+
+/* Delete Section */

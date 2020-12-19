@@ -1,0 +1,115 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
+        <div class="container">
+            <a href="/" class="navbar-brand">Scheduler</a>
+            <button class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/login" class="nav-link">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/register-student" class="nav-link">Student Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/register-tutor" class="nav-link">Tutor Register</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header id="Login">
+        <div class="content-section">
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <fieldset class="form-group">
+                    <legend class="border-bottom mb-4">User Login</legend>
+                    <div class="form-group">
+                        {% for subfield in form.userType %}
+                            <tr>
+                                <td>{{ subfield }}</td>
+                                <td>{{ subfield.label }}</td>
+                            </tr>
+                        {% endfor %}
+                    </div>
+                    <div class="form-group">
+                        {% if form.password.errors %}
+                            {{ form.userName(class="form-control form-control-lg is-invalid", placeholder="Username") }}
+                        {% else %}
+                            {{ form.userName(class="form-control form-control-lg", placeholder="Username") }}
+                        {% endif %}
+                    </div>
+                    <div class="form-group mb-1">
+                        {% if form.password.errors %}
+                            {{ form.password(class="form-control form-control-lg is-invalid", placeholder="Password") }}
+                            <div class="invalid-feedback text-left">
+                                {% for error in form.password.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.password(class="form-control form-control-lg", placeholder="Password") }}
+                        {% endif %}
+                    </div>
+                    <div class="text-left pt-1">
+                        <small class="text-muted">
+                            <a class="ml-2" href=#>Forgot Your Password?</a>
+                        </small>
+                    </div>
+                </fieldset>
+                <div class="form-group">
+				    {{ form.submit(class="btn btn-info btn-lg btn-block") }}
+			    </div>
+            </form>
+        </div>
+        <div class="container border-top pt-3">
+            <div class="row">
+                <div class="col"></div>
+                <div class="col">
+                    <small class="text-muted text-center">
+                        Need An Account?
+                    </small>
+                </div>
+                <div class="col"></div>
+            </div>
+            <div class="row">
+                <div class="col"></div>
+                <div class="col pl-0 pr-1 text-right">
+                    <small class="text-muted">
+                        For Students:
+                    </small>
+                </div>
+                <div class="col pr-0 pl-0 text-left">
+                    <small class="text-muted">
+                        <a class="ml-2" href="/register-student">Start Learning!</a>
+                    </small>
+                </div>
+                <div class="col"></div>
+            </div>
+            <div class="row">
+                <div class="col"></div>
+                <div class="col pl-0 pr-1 text-right">
+                    <small class="text-muted">
+                        For Tutors:
+                    </small>
+                </div>
+                <div class="col pr-0 pl-0 text-left">
+                    <small class="text-muted">
+                        <a class="ml-2" href="/register-tutor">Start Teaching!</a>
+                    </small>
+                </div>
+                <div class="col"></div>
+            </div>
+        </div>
+    </header>
+
+{% endblock content%}

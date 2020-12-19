@@ -1,0 +1,514 @@
+{% extends "layout.html" %}
+{% block content %}
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <div class="container">
+            <a href="/" class="navbar-brand">Scheduler</a>
+            <a class="navbar-brand text-center text-white">Admin Page</a>
+        </div>
+    </nav>
+
+    <div class="accordion" id="accordionParent">
+        <!-- STUDENT CARD -->
+        <div class="card">
+            <div class="card-header" id="headingStudent">
+                <h1 class="text-center mb-0">
+                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#studentView" aria-expanded="false" aria-controls="studentView">
+                    <h1>Students</h1>
+                    </button>
+                </h1>
+            </div>
+            <div id="studentView" class="collapse pt-3 {{ 'show' if currentView == 'students' }}" aria-labelledby="headingStudent" data-parent="#accordionParent">
+                <table id="studentTable" class="table table-striped table-bordered table-sm text-center">
+                    <thead>
+                        <tr>
+                            <th class="th-sm">First Name</th>
+                            <th class="th-sm">Last Name</th>
+                            <th class="th-sm">Email</th>
+                            <th class="th-sm">Username</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                            <tr>
+                                <td class="td-sm">{{ student.firstName }}</td>
+                                <td class="td-sm">{{ student.lastName }}</td>
+                                <td class="td-sm">{{ student.email }}</td>
+                                <td class="td-sm">{{ student.username }}</td>
+                                <!-- These buttons will send a POST to our server to update/delete student info -->
+                                <td scope="col">
+                                    <button type="button" class="btn btn-danger deleteStudent" data-toggle="modal" data-target="#deleteStudent" data-username="{{ student.username }}">DELETE</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TUTOR CARD -->
+        <div class="card">
+            <div class="card-header" id="headingTutor">
+                <h1 class="text-center mb-0">
+                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#tutorView" aria-expanded="false" aria-controls="studentView">
+                    <h1>Tutors</h1>
+                    </button>
+                </h1>
+            </div>
+            <div id="tutorView" class="collapse pt-3 {{ 'show' if currentView == 'tutors' }}" aria-labelledby="headingTutor" data-parent="#accordionParent">
+                <table id="tutorTable" class="table table-striped table-bordered table-sm text-center">
+                    <thead>
+                        <tr>
+                            <th class="th-sm">First Name</th>
+                            <th class="th-sm">Last Name</th>
+                            <th class="th-sm">Email</th>
+                            <th class="th-sm">Username</th>
+                            <th class="th-sm">Subject</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tutor in tutors %}
+                            <tr>
+                                <td class="td-sm">{{ tutor.firstName }}</td>
+                                <td class="td-sm">{{ tutor.lastName }}</td>
+                                <td class="td-sm">{{ tutor.email }}</td>
+                                <td class="td-sm">{{ tutor.username }}</td>
+                                <td class="td-sm">{{ tutor.subject }}</td>
+                                <!-- These buttons will send a POST to our server to update/delete student info -->
+                                <td scope="col">
+                                    <button type="button" class="btn btn-danger deleteTutor" data-toggle="modal" data-target="#deleteTutor" data-username="{{ tutor.username }}">DELETE</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SUBJECTS CARD -->
+        <div class="card">
+            <div class="card-header" id="headingSubjects">
+                <h1 class="text-center mb-0">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#subjectsView" aria-expanded="true"  aria-controls="subjectsView">
+                    <h1>Subjects</h1>
+                    </button>
+                </h1>
+            </div>
+            <div id="subjectsView" class="collapse pt-3 {{ 'show' if currentView == 'subjects' }}" aria-labelledby="headingSubjects" data-parent="#accordionParent">
+                <div class="container text-center pb-4">
+                    {% if error == 'SUB_EDIT' %}
+                        <div id="subEditError" class="text-danger">
+                            The subject you entered when editing already exists. Please enter another subject.
+                        </div>
+                    {% endif %}
+                    <h2>Add A New Subject</h2>
+                    <form action="/admin" method="POST">
+                        <div class="form-row">
+                            <div class="col"></div>
+                            <div class="col">
+                                <input type="text" class="form-control" placeholder="New Subject Name" name="subjectName" required>
+                            </div>
+                            <div class="col">
+                                <input type="number" min="10" max="50" class="form-control" placeholder="Max Student #" name="maxStudent" required>
+                            </div>
+                            <div class="col">
+                                <input type="number" min="10" max="50" class="form-control" placeholder="Max Tutor #" name="maxTutor" required>
+                            </div>
+                            <div class="col">
+                                <input type="hidden" id="addSubject" name="addSubject" value="addSubject"/>
+                                <Button type="submit" class="btn btn-success">ADD NEW SUBJECT</Button>
+                            </div>
+                            <div class="col"></div>
+                        </div>
+                        {% if error == 'SUB_ADD' %}
+                            <div class="text-danger">
+                                That subject already exists. Please enter a new one.
+                            </div>
+                        {% endif %}
+                    </form>
+                </div>
+                <table id="subjectTable" class="table table-striped table-bordered table-sm text-center">
+                    <thead>
+                        <tr>
+                            <th scope="col">Subject</th>
+                            <th scope="col">Max # Students</th>
+                            <th scope="col">Max # Tutors</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for subject in subjects %}
+                            <tr>
+                                <td scope="col">{{ subject.name }}</td>
+                                <td scope="col">{{ subject.maxStudent }}</td>
+                                <td scope="col">{{ subject.maxTutor }}</td>
+                                <!-- These buttons will send a POST to our server to update/delete subject info -->
+                                <td scope="col">
+                                    <button type="button" class="btn btn-warning editSubject" data-toggle="modal" data-target="#editSubject" data-edit="{{ subject.name }}" data-student="{{ subject.maxStudent }}" data-tutor="{{ subject.maxTutor }}">EDIT</button>
+                                </td>
+                                <td scope="col">
+                                    <button type="button" class="btn btn-danger deleteSubject" data-toggle="modal" data-target="#deleteSubject" data-delete="{{ subject.name }}">DELETE</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TIMESLOTS CARD -->
+        <div class="card">
+            <div class="card-header" id="headingTimeslots">
+                <h1 class="text-center mb-0">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#timeslotsView" aria-expanded="true"  aria-controls="timeslotsView">
+                    <h1>Timeslots</h1>
+                    </button>
+                </h1>
+            </div>
+            <div id="timeslotsView" class="collapse pt-3 {{ 'show' if currentView == 'timeslots' }}" aria-labelledby="headingTimeslots" data-parent="#accordionParent">
+                <div class="container text-center pb-4">
+                    {% if error == 'TS_EDIT' %}
+                        <div id="tsEditError" class="text-danger">
+                            The timeslot you entered when editing already exists. Please enter another start time.
+                        </div>
+                    {% endif %}
+                    <h2>Add A New Timeslot</h2>
+                    <form action="/admin" method="POST">
+                        <div class="form-row">
+                            <div class="col"></div>
+                            <div class="col">
+                                <input type="time" step="3600" min="08:00" max="19:00" class="form-control" name="newTimeslot" required>
+                            </div>
+                            <div class="col">
+                                <input type="hidden" id="addTimeslot" name="addTimeslot" value="addTimeslot"/>
+                                <button type="submit" class="btn btn-success">ADD NEW TIMESLOT</button>
+                            </div>
+                            <div class="col"></div>
+                        </div>
+                        {% if error == 'TS_ADD' %}
+                            <div class="text-danger">
+                                That timeslot already exists. Please enter a new start time.
+                            </div>
+                        {% endif %}
+                    </form>
+                </div>
+                <table id="timeslotTable" class="table table-striped table-bordered table-sm text-center">
+                    <thead>
+                        <tr>
+                            <th scope="col">Start Time</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for timeslot in timeslots %}
+                            <tr>
+                                <td scope="col">
+                                    {% if timeslot.start.hour > 12 %}
+                                        {{ timeslot.start.hour - 12 }} PM
+                                    {% elif  timeslot.start.hour < 12 %}
+                                        {{ timeslot.start.hour }} AM
+                                    {% else %}
+                                        12 PM
+                                    {% endif %}
+                                </td>
+                                <!-- These buttons will send a POST to our server to update/delete subject info -->
+                                <td scope="col">
+                                    <button type="button" class="btn btn-warning editTimeslot" data-toggle="modal" data-target="#editTimeslot" data-edit="{{ timeslot.start }}">EDIT</button>
+                                </td>
+                                <td scope="col">
+                                    <button type="button" class="btn btn-danger deleteTimeslot" data-toggle="modal" data-target="#deleteTimeslot" data-delete="{{ timeslot.start }}">DELETE</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- CLASSES CARD -->
+        <div class="card">
+            <div class="card-header" id="headingClasses">
+                <h1 class="text-center mb-0">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#classesView" aria-expanded="true"  aria-controls="classesView">
+                    <h1>Classes</h1>
+                    </button>
+                </h1>
+            </div>
+            <div id="classesView" class="collapse pt-3 {{ 'show' if currentView == 'classes' }}" aria-labelledby="headingClasses" data-parent="#accordionParent">
+                <table id="classesTable" class="table table-striped table-bordered table-sm text-center">
+                    <thead>
+                        <tr>
+                            <th scope="col">Class Date</th>
+                            <th scope="col">Subject</th>
+                            <th scope="col">Timeslot</th>
+                            <th scope="col">Students</th>
+                            <th scope="col">Tutors</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for eachClass in classes %}
+                            <tr>
+                                <td scope="col">{{ eachClass.apptdate }}</td>
+                                <td scope="col">{{ eachClass.subject }}</td>
+                                <td scope="col">
+                                    {% if eachClass.timeslot.hour > 12 %}
+                                        {{ eachClass.timeslot.hour - 12 }} PM
+                                    {% elif eachClass.timeslot.hour < 12 %}
+                                        {{ eachClass.timeslot.hour }} AM
+                                    {% else %}
+                                        12 PM
+                                    {% endif %}
+                                </td>
+                                <td scope="col">
+                                    {% for student in eachClass.studentsInClass %}
+                                        {{ student }}
+                                        {% if not loop.last %}
+                                        ,
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td scope="col">
+                                    {% for tutor in eachClass.tutorsInClass %}
+                                        {{ tutor }}
+                                        {% if not loop.last %}
+                                        ,
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <!-- These buttons will send a POST to our server to update/delete subject info -->
+                                <td scope="col">
+                                    {% if eachClass.tutorsInClass %}
+                                        <button type="button" class="btn btn-warning editClassTutor" data-toggle="modal" data-target="#editClassTutor" data-edit="{{ eachClass.availableTutors }}" data-class="{{ eachClass.classID }}">Change Tutor</button>
+                                    {% else %}
+                                        <button type="button" class="btn btn-outline-warning editClassTutor" data-toggle="modal" data-target="#editClassTutor" data-edit="{{ eachClass.availableTutors }}" data-class="{{ eachClass.classID }}">TUTOR NEEDED!</button>
+                                    {% endif %}
+                                </td>
+                                <td scope="col">
+                                    <button type="button" class="btn btn-danger deleteClass" data-toggle="modal" data-target="#deleteClass" data-delete="{{ eachClass.classID }}">DELETE</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- DELETE STUDENT MODAL -->
+        <div class="modal" id="deleteStudent">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Please confirm!</h2>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Confirm deletion of this student below or exit.</p>
+                    </div>
+                    <div class="modal-footer text-center">
+                        <form action="/admin" method="POST">
+                            <input type="hidden" id="modalDeleteStudent" name="modalDeleteStudent"/>
+                            <Button type="submit" class="btn btn-primary cancel-btn">Delete</Button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DELETE TUTOR MODAL -->
+        <div class="modal" id="deleteTutor">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Please confirm!</h2>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Confirm deletion of this tutor below or exit.</p>
+                    </div>
+                    <div class="modal-footer text-center">
+                        <form action="/admin" method="POST">
+                            <input type="hidden" id="modalDeleteTutor" name="modalDeleteTutor"/>
+                            <Button type="submit" class="btn btn-primary cancel-btn">Delete</Button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT SUBJECT MODAL -->
+        <div class="modal" id="editSubject">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Update Subject!</h2>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="/admin" method="POST">
+                            <div class="form-group {{ 'mb-0' if error == 'SUB_EDIT' }}">
+                                <label>Subject Name:</label>
+                                <input id="editSubjectName" type="text" class="form-control" placeholder="Update Subject Name" name="subjectName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Maximum Number of Students:</label>
+                                <input id="editSubjectMaxStudent" type="number" min="10" max="50" class="form-control" placeholder="Max Student #" name="maxStudent" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Maximum Number of Tutors:</label>
+                                <input id="editSubjectMaxTutor" type="number" min="10" max="50" class="form-control" placeholder="Max Tutor #" name="maxTutor" required>
+                            </div>
+                            <div class="form-group text-center">
+                                <input type="hidden" id="modalEditSubject" name="modalEditSubject"/>
+                                <Button type="submit" class="btn btn-warning">EDIT SUBJECT</Button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DELETE SUBJECT MODAL -->
+        <div class="modal" id="deleteSubject">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Please confirm!</h2>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Confirm deletion of this subject below or exit.</p>
+                    </div>
+                    <div class="modal-footer text-center">
+                        <form action="/admin" method="POST">
+                            <input type="hidden" id="modalDeleteSubject" name="modalDeleteSubject"/>
+                            <Button type="submit" class="btn btn-primary cancel-btn">Delete</Button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT TIMESLOT MODAL -->
+        <div class="modal" id="editTimeslot">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Update Timeslot!</h2>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="/admin" method="POST">
+                            <div class="form-group {{ 'mb-0' if error == 'TS_EDIT' }}">
+                                <label>Timeslot Start:</label>
+                                <input id="editTimeslotStart" type="time" step="3600" min="08:00" max="19:00" class="form-control" name="timeslot" required>
+                            </div>
+                            <div class="form-group text-center">
+                                <input type="hidden" id="modalEditTimeslot" name="modalEditTimeslot"/>
+                                <Button type="submit" class="btn btn-warning">EDIT TIMESLOT</Button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DELETE TIMESLOT MODAL -->
+        <div class="modal" id="deleteTimeslot">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Please confirm!</h2>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Confirm deletion of this timeslot below or exit.</p>
+                    </div>
+                    <div class="modal-footer text-center">
+                        <form action="/admin" method="POST">
+                            <input type="hidden" id="modalDeleteTimeslot" name="modalDeleteTimeslot"/>
+                            <Button type="submit" class="btn btn-primary cancel-btn">Delete</Button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EDIT TUTOR CLASS MODAL -->
+        <div class="modal" id="editClassTutor">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Change Tutor!</h2>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="" method="POST">
+                            <div class="form-group">
+                                <label>Select Old Tutor:</label>
+                                <input type="hidden" id="originalTutorID" name="originalTutorID"/>
+                                <select class="form-control" id="originalClassTutor" required>
+                                    <!-- Jquery inserts appropriate tutor selection here -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Select New Tutor:</label>
+                                <input type="hidden" id="newTutorID" name="newTutorID"/>
+                                <select class="form-control" id="newClassTutor" required>
+                                    <!-- Jquery inserts appropriate tutor selection here -->
+                                </select>
+                            </div>
+                            <div class="form-group text-center">
+                                <input type="hidden" id="modalEditClassTutor" name="modalEditClassTutor"/>
+                                <Button type="submit" class="btn btn-warning">EDIT TUTOR</Button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DELETE CLASS MODAL -->
+        <div class="modal" id="deleteClass">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Please confirm!</h2>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Confirm deletion of this class below or exit.</p>
+                    </div>
+                    <div class="modal-footer text-center">
+                        <form action="/admin" method="POST">
+                            <input type="hidden" id="modalDeleteClass" name="modalDeleteClass"/>
+                            <Button type="submit" class="btn btn-primary cancel-btn">Delete</Button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content%}
