@@ -1,6 +1,5 @@
 # CMLZ Tutoring
-A project created by Chantel Moore and Zachary Levaton for CS340.  
-A live site can be found [here](https://cmlz-tutoring.herokuapp.com/).  
+A project created by Chantel Moore and Zachary Levaton for CS340.   
 <br> <br>
 <img src="https://i.imgur.com/J6vMGMw.png" alt="CMLZ Tutoring Homepage" width="800" height="450" />
 
